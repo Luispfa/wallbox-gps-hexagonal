@@ -28,7 +28,8 @@ af9096216b62   wallbox-php-backend-kata-master_php      "docker-php-entrypoi…"
 ```
 * Via Console Commands
     * Open a tty: docker exec -it sf4_php  bash
-    * Execute:
+    * Command: php bin/console app:auto-pilot Upper-Right-X[space]Upper-Right-Y[space]Position-X[space]Position-Y[space]Direction[space]Instructions-To-Explore
+    * Execute: 
         * command 1: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM
         * command 2: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM 3 3 E MMRMMRMRRM
         * command 3: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM 3 3 E MMRMMRMRRM 3 3 E MMRMMRMRLM
