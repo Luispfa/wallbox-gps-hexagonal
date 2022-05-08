@@ -1,3 +1,38 @@
+### Start
+
+* From the root, execute DOCKER
+    ```
+    \wallbox-php-backend-kata-master> .\init.sh
+    ```
+* Shows the running containers
+    ```
+     \wallbox-php-backend-kata-master> docker ps
+    ```
+
+```
+CONTAINER ID   IMAGE                                    COMMAND                  CREATED          STATUS          PORTS                           NAMES
+95ef7aab6d29   wallbox-php-backend-kata-master_apache   "/bin/sh -c 'apachec…"   47 minutes ago   Up 47 minutes   443/tcp, 0.0.0.0:8003->80/tcp   sf4_apache
+af9096216b62   wallbox-php-backend-kata-master_php      "docker-php-entrypoi…"   47 minutes ago   Up 47 minutes   9000/tcp                        sf4_php
+```
+* Open tty
+```
+\wallbox-php-backend-kata-master> docker exec -it sf4_php  bash
+```
+* install PHP packages 
+```
+/home/wwwroot/sf4# composer install
+```
+* Execute unit test
+```
+/var/www/sf4# ./vendor/bin/simple-phpunit
+```
+* Via Console Commands
+    * Open a tty: docker exec -it sf4_php  bash
+    * Execute:
+        * command 1: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM
+        * command 2: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM 3 3 E MMRMMRMRRM
+        * command 3: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM 3 3 E MMRMMRMRRM 3 3 E MMRMMRMRRM
+
 # Backend Challenge
 
 ## Learning Competencies
