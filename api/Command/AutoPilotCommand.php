@@ -6,7 +6,9 @@ namespace Api\Command;
 
 use App\Application\Bus\Query\AdFinderQuery;
 use App\Application\Bus\Query\AutoPilotQuery;
+use App\Domain\Bus\Query\Query;
 use App\Domain\Bus\Query\QueryHandler;
+use App\Domain\ElectricVehicle;
 use PhpParser\Node\Stmt\Foreach_;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\Console\Command\Command;
@@ -22,11 +24,12 @@ class AutoPilotCommand extends Command
     protected static $defaultName = 'app:auto-pilot';
     protected static $defaultDescription = 'GPS.';
 
-    private $queryHandler;
+    private $queryHandler, $queryHandlerBack;
 
-    public function __construct(QueryHandler $queryHandler)
+    public function __construct(QueryHandler $queryHandler, QueryHandler $queryHandlerBack)
     {
         $this->queryHandler = $queryHandler;
+        $this->queryHandlerBack = $queryHandlerBack;
         parent::__construct();
     }
 
@@ -49,6 +52,7 @@ class AutoPilotCommand extends Command
 
         $upperyRightX = (int)$parameters[0];
         $upperyRightY = (int)$parameters[1];
+        $responses = [];
         for ($i = 2; $i < count($parameters); $i++) {
             $coordinateX = (int)$parameters[$i];
             $coordinateY = (int)$parameters[++$i];
@@ -56,6 +60,13 @@ class AutoPilotCommand extends Command
             $spinMove = $parameters[++$i];
 
             $response = $this->autoPilot($upperyRightX,  $upperyRightY, $coordinateX, $coordinateY, $direction, $spinMove);
+
+            $content = explode(' ', $response->getContent());
+            if (in_array($content, $responses)) {
+                $response = $this->autoPilotBack($upperyRightX,  $upperyRightY, (int)$content[0], (int)$content[1], $content[2]);
+            }
+
+            $responses[] = $content;
 
             $section1 = $output->section();
             $section1->writeln($response);
@@ -65,8 +76,32 @@ class AutoPilotCommand extends Command
 
     private function autoPilot(int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction, string $spinMove): Response
     {
+        return $this->getResponse(
+            $this->queryHandler,
+            $upperyRightX,
+            $upperyRightY,
+            $coordinateX,
+            $coordinateY,
+            $direction,
+            $spinMove
+        );
+    }
+
+    private function autoPilotBack(int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction): Response
+    {
+        return $this->getResponse(
+            $this->queryHandlerBack,
+            $upperyRightX,
+            $upperyRightY,
+            $coordinateX,
+            $coordinateY,
+            $direction
+        );
+    }
+
+    private function getResponse(QueryHandler $query, int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction, ?string $spinMove = null): Response
+    {
         try {
-            $query = $this->queryHandler;
             $response = $query(new AutoPilotQuery(
                 $upperyRightX,
                 $upperyRightY,

@@ -16,7 +16,7 @@ final class AutoPilotQuery implements Query
         int $coordinateX,
         int $coordinateY,
         string $direction,
-        string $spinMove
+        ?string $spinMove = null
     ) {
         $this->upperRightX = $upperRightX;
         $this->upperRightY = $upperRightY;
@@ -51,7 +51,7 @@ final class AutoPilotQuery implements Query
         return $this->direction;
     }
 
-    public function spinMove(): string
+    public function spinMove(): ?string
     {
         return $this->spinMove;
     }

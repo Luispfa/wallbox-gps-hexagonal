@@ -36,10 +36,14 @@ services:
         class: App\Application\Bus\Query\AutoPilotQueryHandler
         public: true
 
+    auto_pilot_back_query:
+        class: App\Application\Bus\Query\AutoPilotBackQueryHandler
+        public: true
+
     Api\Controller\AutoPilotController:
         arguments: ['@auto_pilot_query'] 
         public: true
 
     Api\Command\AutoPilotCommand:
-        arguments: ['@auto_pilot_query'] 
+        arguments: ['@auto_pilot_query','@auto_pilot_back_query'] 
         public: true
