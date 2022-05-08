@@ -6,6 +6,8 @@ namespace App\Domain;
 
 use App\Domain\ValueObject\StringValueObject;
 
+use function PHPSTORM_META\elementType;
+
 final class Direction extends StringValueObject
 {
     public function __construct(string $value)
@@ -15,21 +17,18 @@ final class Direction extends StringValueObject
         $this->allowedCharacter();
     }
 
-    private function allowedCharacter()
+    private function allowedCharacter(): void
     {
-        $pattern = "/[NESW]+$/";
-        if ($bool = preg_match($pattern, $this->value())) {
-            return $bool;
-        } else {
+        $expresion = ElectricVehicle::NORTH . ElectricVehicle::EAST . ElectricVehicle::SOUTH. ElectricVehicle::WEST;
+        $pattern = "/[" . $expresion . "]+$/";
+        if (!preg_match($pattern, $this->value())) {
             throw new \Exception('Direction :Only allowed N, E, S, W characteres .');
         }
     }
 
-    private function lengthCharacter()
+    private function lengthCharacter(): void
     {
-        if (strlen($this->value()) === 1) {
-            return true;
-        } else {
+        if (!(strlen($this->value()) === 1)) {
             throw new \Exception('Direction: Only allowed One character .');
         }
     }

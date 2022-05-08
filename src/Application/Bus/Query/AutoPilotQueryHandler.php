@@ -28,8 +28,8 @@ final class AutoPilotQueryHandler implements QueryHandler
         return $this->autoPilot->__invoke(
             new UpperRightX($query->upperRightX()),
             new UpperRightY($query->upperRightY()),
-            new CoordinateX($query->coordinateX()),
-            new CoordinateY($query->coordinateY()),
+            new CoordinateX($query->coordinateX(), $query->upperRightX()),
+            new CoordinateY($query->coordinateY(), $query->upperRightY()),
             new Direction($query->direction()),
             new SpinMove($query->spinMove())
         );

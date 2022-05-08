@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain;
 
@@ -14,12 +14,11 @@ final class SpinMove extends StringValueObject
         $this->allowedCharacter();
     }
 
-    private function allowedCharacter()
+    private function allowedCharacter(): void
     {
-        $pattern = "/[RLM]+$/";
-        if ($bool = preg_match($pattern, $this->value())) {
-            return $bool;
-        } else {
+        $expresion = ElectricVehicle::RIGHT . ElectricVehicle::LEFT . ElectricVehicle::MOVE;
+        $pattern = "/[" . $expresion . "]+$/";
+        if (!preg_match($pattern, $this->value())) {
             throw new \Exception('spin Move : Only allowed R, L, M characteres.');
         }
     }

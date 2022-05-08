@@ -11,7 +11,6 @@ abstract class IntValueObject
     public function __construct(int $value)
     {
         $this->value = $value;
-        $this->allowed();
     }
 
     public function value(): int
@@ -22,14 +21,5 @@ abstract class IntValueObject
     public function __toString()
     {
         return (string) $this->value();
-    }
-
-    private function allowed()
-    {
-        if ($this->value >= 0) {
-            return true;
-        } else {
-            throw new \Exception('Coordinate :Only allowed greater than or equal to zero.');
-        }
     }
 }
