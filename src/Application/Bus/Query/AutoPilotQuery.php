@@ -8,7 +8,12 @@ use App\Domain\Bus\Query\Query;
 
 final class AutoPilotQuery implements Query
 {
-    private  $upperRightX, $upperRightY, $coordinateX, $coordinateY, $direction, $spinMove;
+    private  $upperRightX;
+    private $upperRightY;
+    private $coordinateX;
+    private $coordinateY;
+    private $direction;
+    private $spinMove;
 
     public function __construct(
         int $upperRightX,

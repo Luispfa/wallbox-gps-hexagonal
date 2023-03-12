@@ -4,34 +4,41 @@ declare(strict_types=1);
 
 namespace App\Application\Bus\Query;
 
-use App\Application\AutoPilot;
 use App\Domain\Bus\Query\QueryHandler;
 use App\Domain\CoordinateX;
 use App\Domain\CoordinateY;
 use App\Domain\Direction;
-use App\Domain\Response\EvResponse;
+use App\Domain\ElectricVehicle;
+use App\Domain\Gps;
 use App\Domain\SpinMove;
 use App\Domain\UpperRightX;
 use App\Domain\UpperRightY;
 
 final class AutoPilotQueryHandler implements QueryHandler
 {
-    private $autoPilot;
+    private $gps;
 
-    public function __construct(AutoPilot $autoPilot)
+    public function __construct(Gps $gps)
     {
-        $this->autoPilot = $autoPilot;
+        $this->gps = $gps;
     }
 
-    public function __invoke(AutoPilotQuery $query): EvResponse
+    public function __invoke(AutoPilotQuery $query): ElectricVehicle
     {
-        return $this->autoPilot->__invoke(
-            new UpperRightX($query->upperRightX()),
-            new UpperRightY($query->upperRightY()),
-            new CoordinateX($query->coordinateX(), $query->upperRightX()),
-            new CoordinateY($query->coordinateY(), $query->upperRightY()),
-            new Direction($query->direction()),
-            new SpinMove($query->spinMove())
+        $upperRightX = new UpperRightX($query->upperRightX());
+        $upperRightY = new UpperRightY($query->upperRightY());
+        $coordinateX = new CoordinateX($query->coordinateX(), $query->upperRightX());
+        $coordinateY = new CoordinateY($query->coordinateY(), $query->upperRightY());
+        $direction = new Direction($query->direction());
+        $spinMove = new SpinMove($query->spinMove());
+
+        return $this->gps->__invoke(
+            $upperRightX,
+            $upperRightY,
+            $coordinateX,
+            $coordinateY,
+            $direction,
+            $spinMove
         );
     }
 }
