@@ -46,7 +46,7 @@ services:
         public: true
 
     Api\Controller\AutoPilotController:
-        arguments: ['@auto_pilot_query_handler'] 
+        arguments: ['@auto_pilot'] 
         public: true
 
     Api\Command\AutoPilotCommand:

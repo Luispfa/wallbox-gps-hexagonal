@@ -34,6 +34,8 @@ af9096216b62   wallbox-php-backend-kata-master_php      "docker-php-entrypoi…"
         * command 2: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM 3 3 E MMRMMRMRRM
         * command 3: php bin/console app:auto-pilot 5 5 1 2 N LMLMLMLMM 3 3 E MMRMMRMRRM 3 3 E MMRMMRMRLM
 
+    * By web use http://localhost:8003/auto-pilot
+
 # Backend Challenge
 
 ## Learning Competencies

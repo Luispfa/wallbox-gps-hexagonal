@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Api\Controller;
 
-use App\Application\Bus\Query\AutoPilotQuery;
-use App\Domain\Bus\Query\QueryHandler;
+use App\Application\AutoPilot;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use function Lambdish\Phunctional\flatten as PhunctionalFlatten;
 
 final class AutoPilotController
 {
-    private $queryHandler;
+    private $autoPilot;
 
-    public function __construct(QueryHandler $queryHandler)
+    public function __construct(AutoPilot $autoPilot)
     {
-        $this->queryHandler = $queryHandler;
+        $this->autoPilot = $autoPilot;
     }
 
     /**
@@ -24,36 +25,28 @@ final class AutoPilotController
     public function autoPilot(): Response
     {
         try {
-            $upperyRightX = 5;
-            $upperyRightY = 5;
-    
-            $coordinateX = 1;
-            $coordinateY = 2;
-            $direction = 'N';
-    
-            $spinMove = 'LMLMLMLMM';
-    
-            // $coordinateX = 3;
-            // $coordinateY = 3;
-            // $direction = 'E';
-    
-            // $spinMove = 'MMRMMRMRRM';
-    
-    
-            $query = $this->queryHandler;
-            $response = $query(new AutoPilotQuery(
-                $upperyRightX,
-                $upperyRightY,
-                $coordinateX,
-                $coordinateY,
-                $direction,
-                $spinMove
-            ));
-    
-            return new Response($response());
+            $upperRightX = 5;
+            $upperRightY = 5;
+
+            $movements = [
+                'coordinateX1' => 1,
+                'coordinateY1' => 2,
+                'direction1' => 'N',
+                'spinMove1' => 'LMLMLMLMM',
+                'coordinateX2' => 3,
+                'coordinateY2' => 3,
+                'direction2' => 'E',
+                'spinMove2' => 'MMRMMRMRRM',
+                'coordinateX3' => 3,
+                'coordinateY3' => 3,
+                'direction3' => 'E',
+                'spinMove3' => 'MMRMMRMRLM',
+            ];
+            $response = $this->autoPilot->__invoke($upperRightX, $upperRightY, PhunctionalFlatten($movements));
+
+            return new JsonResponse($response->evs());
         } catch (\Throwable $th) {
             return new Response($th->getMessage());
         }
-        
     }
 }
