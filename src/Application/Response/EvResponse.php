@@ -29,4 +29,17 @@ final class EvResponse
     {
         return "{$this->coordinateX->value()} {$this->coordinateY->value()} {$this->direction->value()}";
     }
+
+    public static function toResponse()
+    {
+        return static function (EvResponse $ev ) {
+            $evResponse = new self(
+                $ev->coordinateX,
+                $ev->coordinateY,
+                $ev->direction
+            );
+
+            return $evResponse();
+        };
+}
 }
