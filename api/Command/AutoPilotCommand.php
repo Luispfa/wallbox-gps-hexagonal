@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Api\Command;
 
 use App\Application\AutoPilot;
-use App\Application\Bus\Query\AutoPilotQuery;
-use App\Domain\Bus\Query\QueryHandler;
-use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,8 +27,10 @@ class AutoPilotCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('parameters', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'upperyRightX upperyRightY coordinateX1 coordinateY1 direction1 spinMove1 .........')
+        $this->setDescription('Execute Auto Pilot')
+            ->addArgument('upperRightX', InputArgument::REQUIRED, 'Upper-right X coordinate')
+            ->addArgument('upperRightY', InputArgument::REQUIRED, 'Upper-right Y coordinate')
+            ->addArgument('movements', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Initial positions and moves of the electric vehicles, each vehicle represented by an array with four elements: coordinateX, coordinateY, direction, spinMove.')
             ->setHelp('allow to navigate of electric vehicles (EV) with autopilot ...');
     }
 
@@ -41,60 +40,17 @@ class AutoPilotCommand extends Command
             throw new \LogicException('This command accepts only an instance of "ConsoleOutputInterface".');
         }
 
-        $parameters = $input->getArgument('parameters');
+        $upperRightX = (int) $input->getArgument('upperRightX');
+        $upperRightY = (int) $input->getArgument('upperRightY');
+        $movements = $input->getArgument('movements');
 
-        $upperyRightX = (int)$parameters[0];
-        $upperyRightY = (int)$parameters[1];
-        $responses = [];
-        for ($i = 2; $i < count($parameters); $i++) {
-            $coordinateX = (int)$parameters[$i];
-            $coordinateY = (int)$parameters[++$i];
-            $direction = $parameters[++$i];
-            $spinMove = $parameters[++$i];
+        $response = $this->autoPilot->__invoke($upperRightX, $upperRightY, $movements);
 
-            $response = $this->autoPilot->__invoke($upperyRightX,  $upperyRightY, $coordinateX, $coordinateY, $direction, $spinMove);
-            // $content = explode(' ', $response->getContent());
-            // if (in_array($content, $responses)) {
-            //     $response = $this->autoPilotBack($upperyRightX,  $upperyRightY, (int)$content[0], (int)$content[1], $content[2]);
-            // }
-
-            // $responses[] = $content;
-
-            $section1 = $output->section();
-            $section1->writeln($response->__invoke());
+        $section1 = $output->section();
+        foreach ($response->evs() as $r) {
+            $section1->writeln($r);
         }
+
         return 0;
-    }
-
-      private function autoPilotBack(int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction): Response
-    {
-        return $this->getResponse(
-            $this->queryHandlerBack,
-            $upperyRightX,
-            $upperyRightY,
-            $coordinateX,
-            $coordinateY,
-            $direction
-        );
-    }
-
-    private function getResponse(QueryHandler $query, int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction, ?string $spinMove = null): Response
-    {
-        try {
-            $response = $query(new AutoPilotQuery(
-                $upperyRightX,
-                $upperyRightY,
-                $coordinateX,
-                $coordinateY,
-                $direction,
-                $spinMove
-            ));
-
-            $response = new Response($response());
-        } catch (\Throwable $th) {
-            $response =  new Response($th->getMessage());
-        }
-
-        return $response;
     }
 }
