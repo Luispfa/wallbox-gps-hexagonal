@@ -4,19 +4,15 @@ declare(strict_types=1);
 
 namespace Api\Command;
 
-use App\Application\Bus\Query\AdFinderQuery;
+use App\Application\AutoPilot;
 use App\Application\Bus\Query\AutoPilotQuery;
-use App\Domain\Bus\Query\Query;
 use App\Domain\Bus\Query\QueryHandler;
-use App\Domain\ElectricVehicle;
-use PhpParser\Node\Stmt\Foreach_;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AutoPilotCommand extends Command
 {
@@ -24,21 +20,18 @@ class AutoPilotCommand extends Command
     protected static $defaultName = 'app:auto-pilot';
     protected static $defaultDescription = 'GPS.';
 
-    private $queryHandler, $queryHandlerBack;
+    private $autoPilot;
 
-    public function __construct(QueryHandler $queryHandler, QueryHandler $queryHandlerBack)
+    public function __construct(AutoPilot $autoPilot)
     {
-        $this->queryHandler = $queryHandler;
-        $this->queryHandlerBack = $queryHandlerBack;
+        $this->autoPilot = $autoPilot;
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this
-            ->addArgument('parameters', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'upperyRightX upperyRightY coordinateX1 coordinateY1 direction1 spinMove1
-                                                                                                                      coordinateX2 coordinateY2 direction2 spinMove2
-                                                                                                                      .........')
+            ->addArgument('parameters', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'upperyRightX upperyRightY coordinateX1 coordinateY1 direction1 spinMove1 .........')
             ->setHelp('allow to navigate of electric vehicles (EV) with autopilot ...');
     }
 
@@ -59,35 +52,21 @@ class AutoPilotCommand extends Command
             $direction = $parameters[++$i];
             $spinMove = $parameters[++$i];
 
-            $response = $this->autoPilot($upperyRightX,  $upperyRightY, $coordinateX, $coordinateY, $direction, $spinMove);
+            $response = $this->autoPilot->__invoke($upperyRightX,  $upperyRightY, $coordinateX, $coordinateY, $direction, $spinMove);
+            // $content = explode(' ', $response->getContent());
+            // if (in_array($content, $responses)) {
+            //     $response = $this->autoPilotBack($upperyRightX,  $upperyRightY, (int)$content[0], (int)$content[1], $content[2]);
+            // }
 
-            $content = explode(' ', $response->getContent());
-            if (in_array($content, $responses)) {
-                $response = $this->autoPilotBack($upperyRightX,  $upperyRightY, (int)$content[0], (int)$content[1], $content[2]);
-            }
-
-            $responses[] = $content;
+            // $responses[] = $content;
 
             $section1 = $output->section();
-            $section1->writeln($response);
+            $section1->writeln($response->__invoke());
         }
         return 0;
     }
 
-    private function autoPilot(int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction, string $spinMove): Response
-    {
-        return $this->getResponse(
-            $this->queryHandler,
-            $upperyRightX,
-            $upperyRightY,
-            $coordinateX,
-            $coordinateY,
-            $direction,
-            $spinMove
-        );
-    }
-
-    private function autoPilotBack(int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction): Response
+      private function autoPilotBack(int $upperyRightX, int $upperyRightY, int $coordinateX, int $coordinateY, string $direction): Response
     {
         return $this->getResponse(
             $this->queryHandlerBack,
