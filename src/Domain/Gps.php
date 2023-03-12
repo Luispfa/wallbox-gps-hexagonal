@@ -6,27 +6,45 @@ namespace App\Domain;
 
 final class Gps
 {
-    private $electricVehicle;
-    
-    public function __construct(ElectricVehicle $electricVehicle)
-    {
-        $this->electricVehicle = $electricVehicle;
-    }
+    public function __invoke(
+        UpperRightX $upperRightX,
+        UpperRightY $upperRightY,
+        CoordinateX $coordinateX,
+        CoordinateY $coordinateY,
+        Direction $direction,
+        SpinMove $spinMove
+    ): ElectricVehicle {
+        $electricVehicle = ElectricVehicle::create(
+            $upperRightX,
+            $upperRightY,
+            $coordinateX,
+            $coordinateY,
+            $direction,
+            $spinMove
+        );
 
-    public function __invoke(): ElectricVehicle
-    {
-        $spinMove = $this->electricVehicle->getSpinMove();
+        $spinMove = $electricVehicle->getSpinMove();
         $spinMoveToArray = str_split($spinMove->value());
         foreach ($spinMoveToArray as $spin) {
-            if ($spin == $this->electricVehicle::MOVE) {
-                $moveAlong = new MoveAlong();
-                $this->electricVehicle = $moveAlong($this->electricVehicle);
+            if ($spin == $electricVehicle::MOVE) {
+                $this->moveAlong($electricVehicle);
             } else {
-                $spinDirection = new SpinDirection();
-                $this->electricVehicle = $spinDirection($this->electricVehicle, $spin);
+                $this->spinDirection($electricVehicle, $spin);
             }
         }
 
-        return $this->electricVehicle;
+        return $electricVehicle;
+    }
+
+    private function moveAlong(ElectricVehicle $electricVehicle): void
+    {
+        $moveAlong = new MoveAlong();
+        $electricVehicle = $moveAlong($electricVehicle);
+    }
+
+    private function spinDirection(ElectricVehicle $electricVehicle, string $spin): void
+    {
+        $spinDirection = new SpinDirection();
+        $electricVehicle = $spinDirection($electricVehicle, $spin);
     }
 }

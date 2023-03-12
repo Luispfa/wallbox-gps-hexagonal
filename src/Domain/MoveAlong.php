@@ -15,26 +15,26 @@ final class MoveAlong
         switch ($direction) {
             case $electricVehicle::NORTH:
                 $coordinate = $electricVehicle->getCoordinateY()->value() + 1;
-                $coordinate = $coordinate > $upperRightY ? $upperRightY : $coordinate;
+                $coordinate = min($coordinate, $upperRightY);
                 $electricVehicle->setCoordinateY(new CoordinateY($coordinate));
                 break;
             case $electricVehicle::SOUTH:
                 $coordinate = $electricVehicle->getCoordinateY()->value() - 1;
-                $coordinate = $coordinate < 0 ? 0 : $coordinate;
+                $coordinate = max($coordinate, 0);
                 $electricVehicle->setCoordinateY(new CoordinateY($coordinate));
                 break;
             case $electricVehicle::EAST:
                 $coordinate = $electricVehicle->getCoordinateX()->value() + 1;
-                $coordinate = $coordinate > $upperRightX ? $upperRightX : $coordinate;
+                $coordinate = min($coordinate, $upperRightX);
                 $electricVehicle->setCoordinateX(new CoordinateX($coordinate));
                 break;
             case $electricVehicle::WEST:
                 $coordinate = $electricVehicle->getCoordinateX()->value() - 1;
-                $coordinate = $coordinate < 0 ? 0 : $coordinate;
+                $coordinate = max($coordinate, 0);
                 $electricVehicle->setCoordinateX(new CoordinateX($coordinate));
                 break;
             default:
-                break;
+                throw new \InvalidArgumentException('Invalid direction value');
         }
 
         return $electricVehicle;
