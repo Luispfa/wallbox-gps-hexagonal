@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Domain;
+
+use PHPUnit\Framework\TestCase;
+use App\Domain\Gps;
+use App\Domain\UpperRightX;
+use App\Domain\UpperRightY;
+use App\Domain\CoordinateX;
+use App\Domain\CoordinateY;
+use App\Domain\Direction;
+use App\Domain\SpinMove;
+use App\Domain\ElectricVehicle;
+
+class GpsTest extends TestCase
+{
+    /**
+     * @dataProvider provideGpsData
+     */
+    public function testInvoke(
+        UpperRightX $upperRightX,
+        UpperRightY $upperRightY,
+        CoordinateX $coordinateX,
+        CoordinateY $coordinateY,
+        Direction $direction,
+        SpinMove $spinMove,
+        ElectricVehicle $expected
+    ) {
+        // Mock dependencies
+        $moveAlongMock = $this->createMock(MoveAlong::class);
+        $moveAlongMock->method('__invoke')->willReturn($expected);
+      
+        $spinDirectionMock = $this->createMock(SpinDirection::class);
+        $spinDirectionMock->method('__invoke')->willReturn($expected);
+
+        // Create object under test
+        $gps = new Gps();
+
+        // Call method under test
+        $actual = $gps(
+            $upperRightX,
+            $upperRightY,
+            $coordinateX,
+            $coordinateY,
+            $direction,
+            $spinMove
+        );
+
+        // Check result
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function provideGpsData(): array
+    {
+        $upperRightX = new UpperRightX(5);
+        $upperRightY = new UpperRightY(5);
+        $coordinateX = new CoordinateX(1);
+        $coordinateY = new CoordinateY(2);
+        $direction = new Direction('N');
+        $spinMove = new SpinMove('LMLMLMLMM');
+        $expected = new ElectricVehicle(
+            $upperRightX,
+            $upperRightY,
+            $coordinateX,
+            $coordinateY,
+            $direction,
+            $spinMove
+        );
+        return [
+            [$upperRightX, $upperRightY, $coordinateX, $coordinateY, $direction, $spinMove, $expected],
+        ];
+    }
+}
