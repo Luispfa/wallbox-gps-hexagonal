@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Response;
+namespace App\Application\Response;
 
 use App\Domain\CoordinateX;
 use App\Domain\CoordinateY;
@@ -10,8 +10,10 @@ use App\Domain\Direction;
 
 final class EvResponse
 {
-    private  $coordinateX, $coordinateY, $direction;
-
+    private $coordinateX;
+    private $coordinateY;
+    private $direction;
+    
     public function __construct(
         CoordinateX $coordinateX,
         CoordinateY $coordinateY,
