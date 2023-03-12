@@ -31,19 +31,31 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-
-    auto_pilot_query:
-        class: App\Application\Bus\Query\AutoPilotQueryHandler
+    gps:
+        class: App\Domain\Gps
         public: true
 
+    auto_pilot_query_handler:
+        class: App\Application\Bus\Query\AutoPilotQueryHandler
+        arguments: ['@gps']
+        public: true
+
+    auto_pilot:
+        class: App\Application\AutoPilot
+        arguments: ['@auto_pilot_query_handler']
+        public: true
+
+    Api\Controller\AutoPilotController:
+        arguments: ['@auto_pilot_query_handler'] 
+        public: true
+
+    Api\Command\AutoPilotCommand:
+        arguments: ['@auto_pilot'] 
+        public: true
+    
+    
     auto_pilot_back_query:
         class: App\Application\Bus\Query\AutoPilotBackQueryHandler
         public: true
 
-    Api\Controller\AutoPilotController:
-        arguments: ['@auto_pilot_query'] 
-        public: true
-
-    Api\Command\AutoPilotCommand:
-        arguments: ['@auto_pilot_query','@auto_pilot_back_query'] 
-        public: true
+    
